@@ -20,11 +20,8 @@
 
 try {
     
-    PLANCAKE.PlancakeApiClientSettings = {
-                                
-    }
-    
-    
+    PLANCAKE.PlancakeApiClientSettings = {                           
+    }    
     
     PLANCAKE.ApiClient = new PLANCAKE.PlancakeApiClient({
             apiKey: 'efe31c2f0e034b0c76c7cf6be60b0842f280ee8c', 

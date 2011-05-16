@@ -242,6 +242,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         $.ajax({
             url: request.url,
             crossdomain: true,
+            timeout: 30000,
             async: false,
             dataType: 'json',
             type: 'GET',
@@ -281,6 +282,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
             url: request.url,
             crossdomain: true,
             async: false,
+            timeout: 30000,
             dataType: 'json',
             type: httpMethod,
             data: request.params,
@@ -300,6 +302,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                             url: request.url,
                             crossdomain: true,
                             async: false,
+                            timeout: 30000,
                             dataType: 'json',
                             type: httpMethod,
                             data: request.params,
