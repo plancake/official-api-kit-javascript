@@ -273,7 +273,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      */
     var sendRequest = function(params, methodName, httpMethod)
     {
-        var request = null, response = null, methodResponse = null;          
+        var request = null, response = null, methodResponse = null, errorDuringRequest = null;          
         
         if ( (this.token === null) || !(this.token.length > 0) )
         {
@@ -286,7 +286,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         }
 
         request = prepareRequest.call(this, params, methodName);
-        
+
         $.ajax({
             url: request,
             crossdomain: true,
@@ -297,6 +297,8 @@ PLANCAKE.PlancakeApiClient = function(settings) {
             success: $.proxy( function(dataFromServer) 
             {
                 response = dataFromServer;
+
+                //Plancake.Utils.dump(response);
                 if (response.error)
                 {
                     // if the error is an INVALID_TOKEN_ERROR, we try to get the token again
@@ -318,19 +320,19 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                                 response = dataFromServer;
                                 if (response.error)
                                 {
-                                    throw new Error("Error " + response.error); 
+                                    errorDuringRequest = response.error; 
                                 }
                                 else
                                 {
                                     methodResponse = dataFromServer;
                                 }
                             }, this),
-                            error: function () { throw new Error("Error " + UNKNOWN_ERROR); }
+                            error: function () { errorDuringRequest = "Error " + UNKNOWN_ERROR; }
                          });
                     }
                     else
                     {
-                        throw new Error("Error " + response.error);  
+                        errorDuringRequest = response.error;  
                     }
                 }
                 else
@@ -339,9 +341,15 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                 }
             }, this),
             error: function () {
-                throw new Error("Error " + UNKNOWN_ERROR); 
+                errorDuringRequest = "Error " + UNKNOWN_ERROR;
             }
         });
+        
+        if (errorDuringRequest != null)
+        {
+            throw new Error("Error " + response.error); 
+        }
+        
         return methodResponse;
     }
     
@@ -350,7 +358,6 @@ PLANCAKE.PlancakeApiClient = function(settings) {
     this.test = function ()
     {
         resetToken.call(this);
-        alert(this.token);
     }
     
     /**
@@ -359,6 +366,8 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      */
     this.getServerTime = function()
     {
-        return sendRequest.call(this, {}, 'getServerTime').time;
+        var response = sendRequest.call(this, {}, 'getServerTime');
+
+        return response.time;
     }    
 }

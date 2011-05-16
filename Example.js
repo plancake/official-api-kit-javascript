@@ -24,6 +24,8 @@ try {
                                 
     }
     
+    
+    
     PLANCAKE.ApiClient = new PLANCAKE.PlancakeApiClient({
             apiKey: 'efe31c2f0e034b0c76c7cf6be60b0842f280ee8c', 
             apiSecret: 'g3q82y4UxhYP69Ss',
@@ -34,12 +36,10 @@ try {
             extraInfoForGetTokenCall: 'js_api_test'                                                                  
     });
 
-
     PLANCAKE.ApiClient.test();
-    alert("result: " + PLANCAKE.ApiClient.getServerTime());
 
-    // alert("Testing getServerTime");
-    // alert(PLANCAKE.ApiClient.getServerTime());
+    alert("Testing getServerTime");
+    alert(PLANCAKE.ApiClient.getServerTime());
 } catch(e) {
     alert(e.name + ': ' + e.message);
 }
