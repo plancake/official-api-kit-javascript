@@ -335,7 +335,6 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                 }
                 else
                 {
-                    dump(dataFromServer);
                     methodResponse = dataFromServer;
                 }
             }, this),
