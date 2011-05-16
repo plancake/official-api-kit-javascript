@@ -179,21 +179,27 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      *
      * @param object(associative array) $params
      * @param string methodName
-     * @return string
+     * @return object:
+     *   {
+     *      url: http://.....
+     *      params: a=b&c=d
+     *   }
      */
     var prepareRequest = function(params, methodName) {
-        var request, signature, key;
+        var request = {}, signature, key;
 
         params.token = this.token;
         params.api_ver = API_VER;
 
         signature = getSignatureForRequest(params, methodName);
 
-        request = apiEndpointUrl + '/' + methodName + '/?';
+        request.url = apiEndpointUrl + '/' + methodName;
+        
+        request.params = '';
         for (key in params) {
-            request += key + '=' + encodeURI(params[key]) + '&';
+            request.params += key + '=' + encodeURI(params[key]) + '&';
         }
-        request += 'sig=' + signature;
+        request.params += 'sig=' + signature;
 
         return request;
     }
@@ -234,12 +240,12 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         request = prepareRequest.call(this, params, 'getToken');
 
         $.ajax({
-            url: request,
+            url: request.url,
             crossdomain: true,
             async: false,
             dataType: 'json',
             type: 'GET',
-            data: '',
+            data: request.params,
             success: $.proxy( function(dataFromServer) {
                 response = dataFromServer;
                 if (response.error) {
@@ -272,12 +278,12 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         request = prepareRequest.call(this, params, methodName);
 
         $.ajax({
-            url: request,
+            url: request.url,
             crossdomain: true,
             async: false,
             dataType: 'json',
             type: httpMethod,
-            data: '',
+            data: request.params,
             success: $.proxy( function(dataFromServer) 
             {
                 response = dataFromServer;
@@ -291,12 +297,12 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                         request = prepareRequest.call(this, params, methodName);
 
                         $.ajax({
-                            url: request,
+                            url: request.url,
                             crossdomain: true,
                             async: false,
                             dataType: 'json',
                             type: httpMethod,
-                            data: '',
+                            data: request.params,
                             success: $.proxy( function(dataFromServer) {
                                 response = dataFromServer;
                                 if (response.error) {
