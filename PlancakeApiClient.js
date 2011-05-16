@@ -340,5 +340,59 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         var response = sendRequest.call(this, {}, 'getServerTime');
 
         return response.time;
-    }    
+    } 
+    
+     /**
+     * @param int fromTimestamp (=null) - to return only the lists created or edited after this timestamp (GMT)
+     * @param int toTimestamp (=null) - to return only the lists created or edited till this timestamp (GMT)
+     * @return object
+     */
+    this.getLists = function(fromTimestamp, toTimestamp)
+    {
+        params = {};
+
+        if (fromTimestamp > 0)
+        {
+            params.from_ts = fromTimestamp;
+            params.to_ts = toTimestamp;
+        }
+
+        response = sendRequest.call(this, params, 'getLists');
+
+        return response.lists;
+    }  
+    
+    /**
+     *
+     * @param object (PlancakeTask) task
+     * @return int - the taskId
+     */
+    this.addTask = function(task)
+    {        
+        params.descr = task.description;
+        params.is_header = task.isHeader ? 1 : 0;
+        params.is_starred = task.isStarred ? 1 : 0;
+
+        if (task.listId !== null)
+            params.list_id = task.listId;
+        if (task.dueDate !== null)
+            params.due_date = task.dueDate;
+        if (task.dueTime !== null)
+            params.due_time = task.dueTime;
+        if (task.repetitionId !== null)
+            params.repetition_id = task.repetitionId;
+        if (task.repetitionParam !== null)
+            params.repetition_param = task.repetitionParam;
+        if (task.repetitionIcalRrule !== null)
+            params.repetition_ical_rrule = task.repetitionIcalRrule;
+        if (task.note !== null)
+            params.note = task.note;
+        if (task.tagIds !== null)
+            params.tag_ids = task.tagIds;
+
+        response = sendRequest.call(this, params, 'addTask');
+
+        return response.task_id;
+    }
+    
 }

@@ -18,35 +18,18 @@
 *                                                                                    *
 **************************************************************************************/
 
-try {
-    
-    PLANCAKE.PlancakeApiClientSettings = {
-                                
-    }
-    
-    
-    
-    PLANCAKE.ApiClient = new PLANCAKE.PlancakeApiClient({
-            apiKey: 'efe31c2f0e034b0c76c7cf6be60b0842f280ee8c', 
-            apiSecret: 'g3q82y4UxhYP69Ss',
-            apiEndpointUrl: 'http://www.plancake/api_dev.php',
-            userKey: 'jXkGa0uRuOlxcDO9VzeUWwfFIekYQZZj', // check Settings page
-            userEmailAddress: '', // this is usually empty
-            userPassword: '', // this is usually empty
-            extraInfoForGetTokenCall: 'js_api_test'                                                                  
-    });
+var PLANCAKE = PLANCAKE || {};
 
-    alert("Testing getServerTime");
-    alert(PLANCAKE.ApiClient.getServerTime());
-    
-    alert("Testing getLists - see Firebug console");
-    console.log(lists = PLANCAKE.ApiClient.getLists());
-    
-    alert("Testing addTask");
-    var task = new PLANCAKE.Task();
-    task.description = 'test from Javascript API kit';
-    alert(PLANCAKE.ApiClient.addTask(task));    
-
-} catch(e) {
-    alert(e.name + ': ' + e.message);
+PLANCAKE.Task = function () {
+    this.description = null;
+    this.listId = null;
+    this.isStarred = false;
+    this.isHeader = false;
+    this.dueDate = null; // in the yyyy-mm-dd format
+    this.dueTime = null; // in the HH:mm 24h format (i.e.: 09:15, 19:13)
+    this.repetitionId = null;
+    this.repetitionParam = null;
+    this.repetitionIcalRrule = null;
+    this.note = null;
+    this.tagIds = null; // comma-separated
 }
