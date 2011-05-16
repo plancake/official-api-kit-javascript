@@ -286,3 +286,12 @@ PLANCAKE.Utils.md5 = function (str) {
 
     return temp.toLowerCase();
 }
+
+PLANCAKE.Utils.dump = function (obj) {
+    var out = '';
+    for (var i in obj) {
+        out += i + ": " + obj[i] + "\n";
+    }
+
+    alert(out);
+}

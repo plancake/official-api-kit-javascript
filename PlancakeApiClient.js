@@ -151,16 +151,6 @@ PLANCAKE.PlancakeApiClient = function(settings) {
     }
 
 /***** PRIVATE METHODS *****/
-
-    function dump(obj) {
-        var out = '';
-        for (var i in obj) {
-            out += i + ": " + obj[i] + "\n";
-        }
-
-        alert(out);
-    }
-    
     /**
      *
      * @param object(associative array) params - including token
