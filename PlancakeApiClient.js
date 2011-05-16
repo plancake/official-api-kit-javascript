@@ -101,27 +101,21 @@ PLANCAKE.PlancakeApiClient = function(settings) {
     if ( (settings.apiKey != null) && (settings.apiKey != undefined) 
                                     && (settings.apiKey.length > 0)) {
         apiKey = settings.apiKey;
-    }
-    else
-    {
+    } else {
         throw new Error('You need  to specify an API key');
     }
 
     if ( (settings.apiSecret != null) && (settings.apiSecret != undefined) 
                                     && (settings.apiSecret.length > 0)) {
         apiSecret = settings.apiSecret;
-    }
-    else
-    {
+    } else {
         throw new Error('You need  to specify an API secret');
     }
     
     if ( (settings.apiEndpointUrl != null) && (settings.apiEndpointUrl != undefined) 
                                     && (settings.apiEndpointUrl.length > 0)) {
         apiEndpointUrl = settings.apiEndpointUrl;
-    }
-    else
-    {
+    } else {
         throw new Error('You need  to specify an API endpoint');
     }    
 
@@ -171,8 +165,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         paramKeys.sort();
 
         str = methodName;
-        for(i in paramKeys)
-        {
+        for(i in paramKeys) {
            str +=  paramKeys[i] + params[paramKeys[i]];
         }
 
@@ -197,8 +190,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         signature = getSignatureForRequest(params, methodName);
 
         request = apiEndpointUrl + '/' + methodName + '/?';
-        for (key in params)
-        {
+        for (key in params) {
             request += key + '=' + encodeURI(params[key]) + '&';
         }
         request += 'sig=' + signature;
@@ -223,23 +215,19 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         params.api_key = apiKey;
         params.api_ver = API_VER;
 
-        if ( extraInfoForGetTokenCall !== null )
-        {
+        if ( extraInfoForGetTokenCall !== null ) {
             params.extra_info = extraInfoForGetTokenCall;
         }
 
-	if (userEmailAddress !== null)
-	{
+	if (userEmailAddress !== null) {
 	   params.user_email = userEmailAddress;		  
 	}
 
-	if (userPassword !== null)
-	{
+	if (userPassword !== null) {
 	   params.user_pwd = userPassword;		  
 	}
 
-	if (userKey !== null)
-	{
+	if (userKey !== null) {
 	   params.user_key = userKey;
 	}
 
@@ -254,8 +242,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
             data: '',
             success: $.proxy( function(dataFromServer) {
                 response = dataFromServer;
-                if (response.error)
-                {
+                if (response.error) {
                    throw new Error("Error " + response.error);
                 }
 
@@ -271,17 +258,14 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      * @param object httpMethod (= GET)
      * @return json object
      */
-    var sendRequest = function(params, methodName, httpMethod)
-    {
+    var sendRequest = function(params, methodName, httpMethod) {
         var request = null, response = null, methodResponse = null, errorDuringRequest = null;          
         
-        if ( (this.token === null) || !(this.token.length > 0) )
-        {
+        if ( (this.token === null) || !(this.token.length > 0) ) {
             resetToken.call(this);
         }
 
-        if ( (httpMethod === undefined) || (httpMethod === null) )
-        {
+        if ( (httpMethod === undefined) || (httpMethod === null) ) {
             httpMethod = 'GET';
         }
 
@@ -299,12 +283,10 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                 response = dataFromServer;
 
                 //Plancake.Utils.dump(response);
-                if (response.error)
-                {
+                if (response.error) {
                     // if the error is an INVALID_TOKEN_ERROR, we try to get the token again
                     // (maybe it was just expired)
-                    if (response.error == INVALID_TOKEN_ERROR)
-                    {
+                    if (response.error == INVALID_TOKEN_ERROR) {
                         resetToken();
                         request = prepareRequest.call(this, params, methodName);
 
@@ -315,28 +297,20 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                             dataType: 'json',
                             type: httpMethod,
                             data: '',
-                            success: $.proxy( function(dataFromServer) 
-                            {
+                            success: $.proxy( function(dataFromServer) {
                                 response = dataFromServer;
-                                if (response.error)
-                                {
+                                if (response.error) {
                                     errorDuringRequest = response.error; 
-                                }
-                                else
-                                {
+                                } else {
                                     methodResponse = dataFromServer;
                                 }
                             }, this),
                             error: function () { errorDuringRequest = "Error " + UNKNOWN_ERROR; }
                          });
-                    }
-                    else
-                    {
+                    } else {
                         errorDuringRequest = response.error;  
                     }
-                }
-                else
-                {
+                } else {
                     methodResponse = dataFromServer;
                 }
             }, this),
@@ -345,8 +319,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
             }
         });
         
-        if (errorDuringRequest != null)
-        {
+        if (errorDuringRequest != null) {
             throw new Error("Error " + response.error); 
         }
         
@@ -355,8 +328,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
     
 /***** PUBLIC METHODS *****/
 
-    this.test = function ()
-    {
+    this.test = function () {
         resetToken.call(this);
     }
     
@@ -364,8 +336,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      *
      * @return array
      */
-    this.getServerTime = function()
-    {
+    this.getServerTime = function() {
         var response = sendRequest.call(this, {}, 'getServerTime');
 
         return response.time;
