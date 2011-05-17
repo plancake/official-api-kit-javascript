@@ -1,0 +1,13 @@
+{
+  "name": "Plancake Extension for Google Chrome",
+  "version": "1.0",
+  "description": "Plancake Extension for Google Chrome.",
+  "browser_action": {
+    "default_icon": "icon.png",
+    "popup": "mainView.html"
+  },
+  "permissions": [
+    "http://api.plancake.com/",
+    "http://www.plancake.com/"
+  ]
+}

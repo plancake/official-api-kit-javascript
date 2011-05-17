@@ -249,6 +249,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
             data: request.params,
             success: $.proxy( function(dataFromServer) {
                 response = dataFromServer;
+
                 if (response.error) {
                    throw new Error("Error " + response.error);
                 }

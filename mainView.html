@@ -1,0 +1,32 @@
+<html>
+<head>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    
+    <ul>
+        <li><a href="#" id="resetLink">Reset</a></li>        
+        <li><a href="#">Reload</a></li>
+        <li><a href="http://www.plancake.com">Homepage</a></li>
+    </ul>
+    
+    <form name="enterUserKey" id="enterUserKey" style="display: none">
+        <input type="text" name="userKey" id="userKeyValue" />
+        <input type="submit" value="send" />
+        <p>You can copy and paste your userKey from your Plancake Settings page</p>
+    </form>
+    
+    <form name="enterTask" id="enterTask" style="display: none">
+        <input type="text" name="task" id="enterTaskValue" value="" />
+        <input type="submit" value="Add Task" />        
+    </form>
+    
+
+        <script src="jquery.js"></script>          
+        <script src="jquery.cookie.js"></script>         
+        <script src="Utils.js"></script>
+        <script src="PlancakeTask.js"></script>         
+        <script src="PlancakeApiClient.js"></script>
+        <script src="GoogleChromeExtension.js"></script>        
+</body>
+</html>
