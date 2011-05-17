@@ -51,8 +51,6 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      * @var string
      */
     this.token = null;
-    
-    this.testProp = 'ABC';
 
 
 /***** PRIVATE PROPERTIES *****/
@@ -245,7 +243,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
             timeout: 30000,
             async: false,
             dataType: 'json',
-            type: 'GET',
+            type: 'POST', // if we use GET, the reply could be cached, even if we don't want
             data: request.params,
             success: $.proxy( function(dataFromServer) {
                 response = dataFromServer;
@@ -263,7 +261,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      *
      * @param object params
      * @param string methodName
-     * @param object httpMethod (= GET)
+     * @param object httpMethod (= POST)
      * @return json object
      */
     var sendRequest = function(params, methodName, httpMethod) {
@@ -274,7 +272,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         }
 
         if ( (httpMethod === undefined) || (httpMethod === null) ) {
-            httpMethod = 'GET';
+            httpMethod = 'POST'; // if we use GET, the reply could be cached, even if we don't want
         }
 
         request = prepareRequest.call(this, params, methodName);

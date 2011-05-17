@@ -2,3 +2,27 @@ body
 {
     width: 300px;
 }
+
+select#listsCombo
+{
+    width: 250px;
+}
+
+.header
+{
+    margin: 2px;
+    background-color: #ff6633;
+}
+
+input#enterTaskValue
+{
+    width: 250px;
+    padding: 3px;
+    font-size: 13px;
+    border: 1px solid orange;
+}
+
+#refreshListsCombo:hover
+{
+    cursor: pointer;
+}
