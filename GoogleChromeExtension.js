@@ -143,7 +143,6 @@ PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient = function() {
         {
             if (token = localStorage.getItem(PLANCAKE_CHROME_EXTENSION.tokenStorageName))
             {
-                alert("token: " + token);
                 PLANCAKE_CHROME_EXTENSION.plancakeApiClient.token = token;
             }
         }        
