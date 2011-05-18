@@ -307,6 +307,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         var request = null, response = null;          
         
         if ( (this.token === null) || !(this.token.length > 0) ) {
+            alert("resetting token 1");
             resetToken.call(this);
         }
 
@@ -337,6 +338,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                     // (maybe it was just expired)
                     if (response.error == INVALID_TOKEN_ERROR) {
                         resetToken();
+                        alert("resetting token 2");
                         request = prepareRequest.call(this, params, methodName);
 
                         $.ajax({
@@ -437,7 +439,9 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      *        Those 2 callbacks are passed the data coming from the server
      */
     this.addTask = function(task, callbacks)
-    {        
+    {
+        params = {};
+
         params.descr = task.description;
         params.is_header = task.isHeader ? 1 : 0;
         params.is_starred = task.isStarred ? 1 : 0;

@@ -26,8 +26,9 @@ PLANCAKE_CHROME_EXTENSION.apiSecret = 'g3q82y4UxhYP69Ss';
 PLANCAKE_CHROME_EXTENSION.apiEndpointUrl = 'http://api.plancake.com/api.php';
 
 
-PLANCAKE_CHROME_EXTENSION.userKeyCookieName = 'userKey';
-PLANCAKE_CHROME_EXTENSION.listsKeyName = 'lists';
+PLANCAKE_CHROME_EXTENSION.userKeyStorageName = 'userKey';
+PLANCAKE_CHROME_EXTENSION.tokenStorageName = 'token';
+PLANCAKE_CHROME_EXTENSION.listsStorageName = 'lists';
 PLANCAKE_CHROME_EXTENSION.cookieLifetimeInDays = 60;
 
 
@@ -36,7 +37,7 @@ $(document).ready(function() {
     
     // $('#ajaxInProgress').css('display', 'none');    
     
-    if (! $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyCookieName)) {
+    if (! $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName)) {
         $('form#enterUserKey').show();
         $('#userKeyValue').focus();
     } else {
@@ -52,7 +53,7 @@ $(document).ready(function() {
     }
     
     $('form#enterUserKey').submit(function() {
-        $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyCookieName, $('#userKeyValue').val(), {expires: PLANCAKE_CHROME_EXTENSION.cookieLifetimeInDays});
+        $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName, $('#userKeyValue').val(), {expires: PLANCAKE_CHROME_EXTENSION.cookieLifetimeInDays});
         
         try
         {
@@ -81,10 +82,9 @@ $(document).ready(function() {
         plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
 
         var task = new PLANCAKE.Task();
+        
         task.description = $('#enterTaskValue').val();
         task.listId = $('select#listsCombo').val();
-        
-        
         
         plancakeApiClient.addTask(task, {
             success: function(dataFromServer) {
@@ -120,9 +120,11 @@ $(document).ready(function() {
  * It implements a Singleton design pattern
  */
 PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient = function() {
+    var token;
+    
     if (PLANCAKE_CHROME_EXTENSION.plancakeApiClient === null)
     {
-        if (! $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyCookieName)) {
+        if (! $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName)) {
             alert("You need to store the userKey in a cookie before getting an API client");
             return null;
         }
@@ -131,18 +133,26 @@ PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient = function() {
                 apiKey: PLANCAKE_CHROME_EXTENSION.apiKey, 
                 apiSecret: PLANCAKE_CHROME_EXTENSION.apiSecret,
                 apiEndpointUrl: PLANCAKE_CHROME_EXTENSION.apiEndpointUrl,
-                userKey: $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyCookieName), // check Settings page
+                userKey: $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName), // check Settings page
                 startOfCommunicationCallback: PLANCAKE_CHROME_EXTENSION.startOfCommunicationCallback,
                 endOfCommunicationWithSuccessCallback: PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithSuccessCallback,
                 endOfCommunicationWithErrorCallback: PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithErrorCallback              
-        });   
+        });
         
+        if (window.localStorage)
+        {
+            if (token = localStorage.getItem(PLANCAKE_CHROME_EXTENSION.tokenStorageName))
+            {
+                alert("token: " + token);
+                PLANCAKE_CHROME_EXTENSION.plancakeApiClient.token = token;
+            }
+        }        
     }
     return PLANCAKE_CHROME_EXTENSION.plancakeApiClient;
 }
 
 PLANCAKE_CHROME_EXTENSION.resetAll = function() {
-    $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyCookieName, null);
+    $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName, null);
     $.cookie(PLANCAKE_CHROME_EXTENSION.listsCookieName, null);        
     $('form#enterUserKey').show();
     $('form#enterTask').hide();        
@@ -178,7 +188,7 @@ PLANCAKE_CHROME_EXTENSION.populateListsCombo = function()
 
     if (window.localStorage)
     {
-        lists = JSON.parse(localStorage.getItem(PLANCAKE_CHROME_EXTENSION.listsKeyName));
+        lists = JSON.parse(localStorage.getItem(PLANCAKE_CHROME_EXTENSION.listsStorageName));
     }
 
     if (! lists)
@@ -187,7 +197,7 @@ PLANCAKE_CHROME_EXTENSION.populateListsCombo = function()
            success: function(listsFromServer) {
                if (window.localStorage)
                {
-                    localStorage.setItem(PLANCAKE_CHROME_EXTENSION.listsKeyName, JSON.stringify(listsFromServer.lists));
+                    localStorage.setItem(PLANCAKE_CHROME_EXTENSION.listsStorageName, JSON.stringify(listsFromServer.lists));
                }
                
                buildHtml(listsFromServer.lists);
@@ -203,6 +213,10 @@ PLANCAKE_CHROME_EXTENSION.startOfCommunicationCallback = function () {
 }
 
 PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithSuccessCallback = function () {
+    if (window.localStorage)
+    {
+        localStorage.setItem(PLANCAKE_CHROME_EXTENSION.tokenStorageName, PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient().token);
+    }    
     $('#ajaxInProgress').hide();
 }
 
