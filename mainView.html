@@ -3,10 +3,8 @@
     <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-    
     <ul>
         <li><a href="#" id="resetLink">Reset</a></li>        
-        <li><a href="#">Reload</a></li>
         <li><a href="#" id="getUrlLink">Get url</a></li>        
     </ul>
     
@@ -25,9 +23,13 @@
         <input type="submit" value="Add Task" />        
     </form>
     
-
+    <div id="ajaxInProgress" style="display: none">&nbsp;</div>
+    <div id="successFeedback" style="display: none"></div>
+    <div id="errorFeedback" style="display: none"></div>
+    
         <script src="jquery.js"></script>          
         <script src="jquery.cookie.js"></script>
+        <script src="jquery.blockUI.js"></script>        
         <script src="json2.js"></script>          
         <script src="Utils.js"></script>
         <script src="PlancakeTask.js"></script>         

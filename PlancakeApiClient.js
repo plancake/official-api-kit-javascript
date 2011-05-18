@@ -23,6 +23,11 @@
 var PLANCAKE = PLANCAKE || {};
 
 ////////////////////////////////////////////////
+//
+// Throws an error in case of misconfiguration.
+// Calls the callback endOfCommunicationWithErrorCallback (see param settings)
+// in the case of a communication error
+//
 // @param object settings, i.e.:
 // {
 //           apiKey: 'efe31c2f0e034b0c76c7cf6be60b0842f280ee8c', 
@@ -31,7 +36,10 @@ var PLANCAKE = PLANCAKE || {};
 //           userKey: 'jXkGa0uRuOlxcDO9VzeUWwfFIekYQZZj', // check Settings page
 //           userEmailAddress: '', // this is usually empty
 //           userPassword: '', // this is usually empty
-//           extraInfoForGetTokenCall: 'this is the test for JS API kit'                                                                  
+//           extraInfoForGetTokenCall: 'this is the test for JS API kit', // optional
+//           startOfCommunicationCallback: displayAjaxLoader, // optional
+//           endOfCommunicationWithSuccessCallback: displaySuccessMessage, // optional
+//           endOfCommunicationWithErrorCallback: displayErrorMessage // optional - the error message is passed as input                                                                            
 // }
 // 
 ////////////////////////////////////////////////
@@ -93,6 +101,21 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      * @var string
      */
     var userPassword = null;
+    
+    /**
+     * @var string
+     */    
+    var startOfCommunicationCallback = null;
+    
+    /**
+     * @var string
+     */    
+    var endOfCommunicationWithSuccessCallback = null;
+
+    /**
+     * @var string
+     */    
+    var endOfCommunicationWithErrorCallback = null;
 
 /***** INITIALIZATION *****/
 
@@ -140,6 +163,18 @@ PLANCAKE.PlancakeApiClient = function(settings) {
     if ( (settings.extraInfoForGetTokenCall != null) && (settings.extraInfoForGetTokenCall != undefined) 
                                         && (settings.extraInfoForGetTokenCall.length > 0)) {    
         extraInfoForGetTokenCall = settings.extraInfoForGetTokenCall;        
+    }
+
+    if ( (settings.startOfCommunicationCallback != null) && (settings.startOfCommunicationCallback != undefined) ) {    
+        startOfCommunicationCallback = settings.startOfCommunicationCallback;      
+    }
+
+    if ( (settings.endOfCommunicationWithSuccessCallback != null) && (settings.endOfCommunicationWithSuccessCallback != undefined) ) {    
+        endOfCommunicationWithSuccessCallback = settings.endOfCommunicationWithSuccessCallback;        
+    }
+
+    if ( (settings.endOfCommunicationWithErrorCallback != null) && (settings.endOfCommunicationWithErrorCallback != undefined) ) {    
+        endOfCommunicationWithErrorCallback = settings.endOfCommunicationWithErrorCallback;        
     }
 
 /***** PRIVATE METHODS *****/
@@ -249,7 +284,9 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                 response = dataFromServer;
 
                 if (response.error) {
-                   throw new Error("Error " + response.error);
+                    if (endOfCommunicationWithErrorCallback !== null) {
+                        endOfCommunicationWithErrorCallback(response.error);
+                    }
                 }
 
                 this.token = response.token;                  
@@ -276,6 +313,11 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         }
 
         request = prepareRequest.call(this, params, methodName);
+        
+        if (startOfCommunicationCallback !== null)
+        {
+            startOfCommunicationCallback();
+        }
 
         $.ajax({
             url: request.url,
@@ -312,14 +354,22 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                                 } else {
                                     methodResponse = dataFromServer;
                                 }
+                                if (endOfCommunicationWithSuccessCallback !== null) {
+                                    endOfCommunicationWithSuccessCallback();
+                                }
                             }, this),
-                            error: function () { errorDuringRequest = "Error " + UNKNOWN_ERROR; }
+                            error: function () { 
+                                errorDuringRequest = "Error " + UNKNOWN_ERROR; 
+                            }
                          });
                     } else {
                         errorDuringRequest = response.error;  
                     }
                 } else {
                     methodResponse = dataFromServer;
+                    if (endOfCommunicationWithSuccessCallback !== null) {
+                        endOfCommunicationWithSuccessCallback();
+                    }                    
                 }
             }, this),
             error: function () {
@@ -328,7 +378,9 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         });
         
         if (errorDuringRequest != null) {
-            throw new Error("Error " + response.error); 
+            if (endOfCommunicationWithErrorCallback !== null) {
+                endOfCommunicationWithErrorCallback(response.error);
+            }            
         }
         
         return methodResponse;

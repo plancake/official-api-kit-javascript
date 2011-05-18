@@ -32,7 +32,9 @@ PLANCAKE_CHROME_EXTENSION.cookieLifetimeInDays = 60;
 
 
 $(document).ready(function() {
-    var plancakeApiClient = null;
+    var plancakeApiClient = null; 
+    
+    // $('#ajaxInProgress').css('display', 'none');    
     
     if (! $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyCookieName)) {
         $('form#enterUserKey').show();
@@ -119,7 +121,10 @@ PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient = function() {
                 apiKey: PLANCAKE_CHROME_EXTENSION.apiKey, 
                 apiSecret: PLANCAKE_CHROME_EXTENSION.apiSecret,
                 apiEndpointUrl: PLANCAKE_CHROME_EXTENSION.apiEndpointUrl,
-                userKey: $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyCookieName) // check Settings page
+                userKey: $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyCookieName), // check Settings page
+                startOfCommunicationCallback: PLANCAKE_CHROME_EXTENSION.displayAjaxLoader,
+                endOfCommunicationWithSuccessCallback: PLANCAKE_CHROME_EXTENSION.displaySuccessMessage,
+                endOfCommunicationWithErrorCallback: PLANCAKE_CHROME_EXTENSION.displayErrorMessage              
         });   
         
     }
@@ -166,3 +171,15 @@ PLANCAKE_CHROME_EXTENSION.populateListsCombo = function()
         listsCombo.append(listsOption);
     }   
 }
+
+PLANCAKE_CHROME_EXTENSION.displayAjaxLoader = function () {
+    $('#ajaxInProgress').show();
+}
+
+PLANCAKE_CHROME_EXTENSION.displaySuccessMessage = function () {
+    $('#ajaxInProgress').hide();
+}
+
+PLANCAKE_CHROME_EXTENSION.displayErrorMessage = function (errorMessage) {
+    $('#ajaxInProgress').hide();
+}   

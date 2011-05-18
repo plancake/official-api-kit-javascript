@@ -1,28 +1,35 @@
-body
-{
+body {
     width: 300px;
+    height: 200px;
 }
 
-select#listsCombo
-{
+select#listsCombo {
     width: 250px;
 }
 
-.header
-{
+.header {
     margin: 2px;
     background-color: #ff6633;
 }
 
-input#enterTaskValue
-{
+input#enterTaskValue {
     width: 250px;
     padding: 3px;
     font-size: 13px;
     border: 1px solid orange;
 }
 
-#refreshListsCombo:hover
-{
+#refreshListsCombo:hover {
     cursor: pointer;
+}
+
+#ajaxInProgress
+{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    z-index: 99;
+    background-image:url('images/ajax_loader_small.gif');
+    background-repeat: no-repeat;
 }
