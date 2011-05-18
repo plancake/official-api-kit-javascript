@@ -33,3 +33,13 @@ input#enterTaskValue {
     background-image:url('images/ajax_loader_small.gif');
     background-repeat: no-repeat;
 }
+
+#errorFeedback
+{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 99;    
+    background-color: red;
+    color: white;
+}

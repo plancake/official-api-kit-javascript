@@ -220,5 +220,12 @@ PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithSuccessCallback = function () {
 }
 
 PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithErrorCallback = function (errorMessage) {
+    function hiding()
+    {
+        $('#errorFeedback').hide('fast');
+    }
+    
     $('#ajaxInProgress').hide();
+    $('#errorFeedback').text('An error occurred (error code: ' + errorMessage + ' )').show();
+    setTimeout(hiding, 4000);
 }   
