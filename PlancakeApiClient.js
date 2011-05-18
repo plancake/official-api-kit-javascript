@@ -387,10 +387,6 @@ PLANCAKE.PlancakeApiClient = function(settings) {
     }
     
 /***** PUBLIC METHODS *****/
-
-    this.test = function () {
-        resetToken.call(this);
-    }
     
     /**
      *
