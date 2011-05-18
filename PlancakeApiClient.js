@@ -306,21 +306,20 @@ PLANCAKE.PlancakeApiClient = function(settings) {
     var sendRequest = function(params, methodName, callbacks, httpMethod) {
         var request = null, response = null;          
         
-        if ( (this.token === null) || !(this.token.length > 0) ) {
-            alert("resetting token 1");
-            resetToken.call(this);
-        }
-
         if ( (httpMethod === undefined) || (httpMethod === null) ) {
             httpMethod = 'POST'; // if we use GET, the reply could be cached, even if we don't want
-        }
-
-        request = prepareRequest.call(this, params, methodName);
+        }        
         
         if (startOfCommunicationCallback !== null)
         {
             startOfCommunicationCallback();
+        }        
+        
+        if ( (this.token === null) || !(this.token.length > 0) ) {
+            resetToken.call(this);
         }
+
+        request = prepareRequest.call(this, params, methodName);       
 
         $.ajax({
             url: request.url,
@@ -338,7 +337,6 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                     // (maybe it was just expired)
                     if (response.error == INVALID_TOKEN_ERROR) {
                         resetToken();
-                        alert("resetting token 2");
                         request = prepareRequest.call(this, params, methodName);
 
                         $.ajax({
