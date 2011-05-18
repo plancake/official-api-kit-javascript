@@ -138,7 +138,7 @@ PLANCAKE_CHROME_EXTENSION.resetAll = function() {
     $('form#enterTask').hide();        
 };
 
-PLANCAKE_CHROME_EXTENSION.refreshListsCombo = function(PlancakeApiClient) {
+PLANCAKE_CHROME_EXTENSION.refreshListsCombo = function() {
     $.cookie(PLANCAKE_CHROME_EXTENSION.listsCookieName, null);
     PLANCAKE_CHROME_EXTENSION.populateListsCombo();
 };
