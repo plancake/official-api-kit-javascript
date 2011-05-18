@@ -27,7 +27,7 @@ PLANCAKE_CHROME_EXTENSION.apiEndpointUrl = 'http://api.plancake.com/api.php';
 
 
 PLANCAKE_CHROME_EXTENSION.userKeyCookieName = 'userKey';
-PLANCAKE_CHROME_EXTENSION.listsCookieName = 'lists';
+PLANCAKE_CHROME_EXTENSION.listsKeyName = 'lists';
 PLANCAKE_CHROME_EXTENSION.cookieLifetimeInDays = 60;
 
 
@@ -59,7 +59,8 @@ $(document).ready(function() {
             plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
 
             plancakeApiClient.getServerTime({
-                success: function(serverTime) {
+                success: function(dataFromServer) {
+                    var serverTime = dataFromServer.time;
                     if (serverTime > 0) {
                         // first request to the server was successful: we are ready to go
                         $('form#enterUserKey').hide();
@@ -86,7 +87,8 @@ $(document).ready(function() {
         
         
         plancakeApiClient.addTask(task, {
-            success: function(taskId) {
+            success: function(dataFromServer) {
+                var taskId = dataFromServer.task_id;
                 if ( !(taskId > 0))
                 {
                     alert("Some error occurred."); 
@@ -173,15 +175,22 @@ PLANCAKE_CHROME_EXTENSION.populateListsCombo = function()
     
     var plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
     var lists = null;
-    
-    lists = JSON.parse($.cookie(PLANCAKE_CHROME_EXTENSION.listsCookieName));
+
+    if (window.localStorage)
+    {
+        lists = JSON.parse(localStorage.getItem(PLANCAKE_CHROME_EXTENSION.listsKeyName));
+    }
 
     if (! lists)
     {
-       lists = plancakeApiClient.getLists(null, null, {
-           success: function(lists) {
-               buildHtml(lists);
-               $.cookie(PLANCAKE_CHROME_EXTENSION.listsCookieName, JSON.stringify(lists));
+       plancakeApiClient.getLists(null, null, {
+           success: function(listsFromServer) {
+               if (window.localStorage)
+               {
+                    localStorage.setItem(PLANCAKE_CHROME_EXTENSION.listsKeyName, JSON.stringify(listsFromServer.lists));
+               }
+               
+               buildHtml(listsFromServer.lists);
            }
        });       
     } else {
