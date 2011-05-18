@@ -58,16 +58,18 @@ $(document).ready(function() {
         {
             plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
 
-            if (plancakeApiClient.getServerTime() > 0) {
-                // first request to the server was successful: we are ready to go
-                $('form#enterUserKey').hide();
-                $('form#enterTask').show();
-                
-                PLANCAKE_CHROME_EXTENSION.populateListsCombo();
-                    
-            } else {
-                alert("Some error occurred. Are you sure the userKey was correct?")
-            }
+            plancakeApiClient.getServerTime({
+                success: function(serverTime) {
+                    if (serverTime > 0) {
+                        // first request to the server was successful: we are ready to go
+                        $('form#enterUserKey').hide();
+                        $('form#enterTask').show();
+                        PLANCAKE_CHROME_EXTENSION.populateListsCombo();
+                    } else {
+                        alert("Some error occurred. Are you sure the userKey was correct?")
+                    }
+                }
+            });
         } catch (e) {
             alert("Some error occurred. Are you sure the userKey was correct? (" + e.message + ")");            
         }
@@ -80,14 +82,20 @@ $(document).ready(function() {
         var task = new PLANCAKE.Task();
         task.description = $('#enterTaskValue').val();
         task.listId = $('select#listsCombo').val();
-        var taskId = plancakeApiClient.addTask(task);
-
-        if ( !(taskId > 0))
-        {
-            alert("Some error occurred."); 
-        }
         
-        $('#enterTaskValue').val('');
+        
+        
+        plancakeApiClient.addTask(task, {
+            success: function(taskId) {
+                if ( !(taskId > 0))
+                {
+                    alert("Some error occurred."); 
+                } else {
+                    $('#enterTaskValue').val('');
+                    return;                
+                }
+            }
+        });
         return false;
     });   
     
@@ -122,9 +130,9 @@ PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient = function() {
                 apiSecret: PLANCAKE_CHROME_EXTENSION.apiSecret,
                 apiEndpointUrl: PLANCAKE_CHROME_EXTENSION.apiEndpointUrl,
                 userKey: $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyCookieName), // check Settings page
-                startOfCommunicationCallback: PLANCAKE_CHROME_EXTENSION.displayAjaxLoader,
-                endOfCommunicationWithSuccessCallback: PLANCAKE_CHROME_EXTENSION.displaySuccessMessage,
-                endOfCommunicationWithErrorCallback: PLANCAKE_CHROME_EXTENSION.displayErrorMessage              
+                startOfCommunicationCallback: PLANCAKE_CHROME_EXTENSION.startOfCommunicationCallback,
+                endOfCommunicationWithSuccessCallback: PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithSuccessCallback,
+                endOfCommunicationWithErrorCallback: PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithErrorCallback              
         });   
         
     }
@@ -145,6 +153,24 @@ PLANCAKE_CHROME_EXTENSION.refreshListsCombo = function() {
 
 PLANCAKE_CHROME_EXTENSION.populateListsCombo = function()
 {
+    function buildHtml(lists)
+    {
+        var listsCombo = $('select#listsCombo');
+        var listItem = null, listsOption = null;
+
+        listsCombo.find('option').remove(); // removing all the old options
+
+        for(var i in lists) {
+            listItem = lists[i];
+            listsOption = $('<option></option>').val(listItem.id).html(listItem.name);
+            if (listItem.is_header)
+            {
+                listsOption.addClass('header');
+            }
+            listsCombo.append(listsOption);
+        }        
+    }
+    
     var plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
     var lists = null;
     
@@ -152,34 +178,25 @@ PLANCAKE_CHROME_EXTENSION.populateListsCombo = function()
 
     if (! lists)
     {
-       lists = plancakeApiClient.getLists();
-       $.cookie(PLANCAKE_CHROME_EXTENSION.listsCookieName, JSON.stringify(lists));
+       lists = plancakeApiClient.getLists(null, null, {
+           success: function(lists) {
+               buildHtml(lists);
+               $.cookie(PLANCAKE_CHROME_EXTENSION.listsCookieName, JSON.stringify(lists));
+           }
+       });       
+    } else {
+        buildHtml(lists); 
     }
-
-    var listsCombo = $('select#listsCombo');
-    var listItem = null, listsOption = null;
-    
-    listsCombo.find('option').remove(); // removing all the old options
-
-    for(var i in lists) {
-        listItem = lists[i];
-        listsOption = $('<option></option>').val(listItem.id).html(listItem.name);
-        if (listItem.is_header)
-        {
-            listsOption.addClass('header');
-        }
-        listsCombo.append(listsOption);
-    }   
 }
 
-PLANCAKE_CHROME_EXTENSION.displayAjaxLoader = function () {
+PLANCAKE_CHROME_EXTENSION.startOfCommunicationCallback = function () {
     $('#ajaxInProgress').show();
 }
 
-PLANCAKE_CHROME_EXTENSION.displaySuccessMessage = function () {
+PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithSuccessCallback = function () {
     $('#ajaxInProgress').hide();
 }
 
-PLANCAKE_CHROME_EXTENSION.displayErrorMessage = function (errorMessage) {
+PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithErrorCallback = function (errorMessage) {
     $('#ajaxInProgress').hide();
 }   

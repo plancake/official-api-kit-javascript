@@ -103,17 +103,17 @@ PLANCAKE.PlancakeApiClient = function(settings) {
     var userPassword = null;
     
     /**
-     * @var string
+     * @var function
      */    
     var startOfCommunicationCallback = null;
     
     /**
-     * @var string
+     * @var function
      */    
     var endOfCommunicationWithSuccessCallback = null;
 
     /**
-     * @var string
+     * @var function
      */    
     var endOfCommunicationWithErrorCallback = null;
 
@@ -298,11 +298,13 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      *
      * @param object params
      * @param string methodName
+     * @param object callbacks - it has 2 keys: 'success' and 'error'
+     *        Those 2 callbacks are passed the data coming from the server
      * @param object httpMethod (= POST)
      * @return json object
      */
-    var sendRequest = function(params, methodName, httpMethod) {
-        var request = null, response = null, methodResponse = null, errorDuringRequest = null;          
+    var sendRequest = function(params, methodName, callbacks, httpMethod) {
+        var request = null, response = null;          
         
         if ( (this.token === null) || !(this.token.length > 0) ) {
             resetToken.call(this);
@@ -322,13 +324,11 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         $.ajax({
             url: request.url,
             crossdomain: true,
-            async: false,
             timeout: 30000,
             dataType: 'json',
             type: httpMethod,
             data: request.params,
-            success: $.proxy( function(dataFromServer) 
-            {
+            success: $.proxy( function(dataFromServer) {
                 response = dataFromServer;
 
                 //Plancake.Utils.dump(response);
@@ -342,7 +342,6 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                         $.ajax({
                             url: request.url,
                             crossdomain: true,
-                            async: false,
                             timeout: 30000,
                             dataType: 'json',
                             type: httpMethod,
@@ -350,60 +349,75 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                             success: $.proxy( function(dataFromServer) {
                                 response = dataFromServer;
                                 if (response.error) {
-                                    errorDuringRequest = response.error; 
+                                    if (endOfCommunicationWithErrorCallback !== null) {
+                                        endOfCommunicationWithErrorCallback(response.error);
+                                    }
+                                    if ( (callbacks.error !== null) && (callbacks.error !== undefined) ) {
+                                        callbacks.error(response.error);
+                                    }                                      
                                 } else {
-                                    methodResponse = dataFromServer;
-                                }
-                                if (endOfCommunicationWithSuccessCallback !== null) {
-                                    endOfCommunicationWithSuccessCallback();
+                                    if (endOfCommunicationWithSuccessCallback !== null) {
+                                        endOfCommunicationWithSuccessCallback();
+                                    }
+                                    if ( (callbacks.success !== null) && (callbacks.success !== undefined) ) {
+                                        callbacks.success(dataFromServer);
+                                    }                                    
                                 }
                             }, this),
-                            error: function () { 
-                                errorDuringRequest = "Error " + UNKNOWN_ERROR; 
+                            error: function () {
+                                if (endOfCommunicationWithErrorCallback !== null) {
+                                    endOfCommunicationWithErrorCallback(UNKNOWN_ERROR);
+                                }
+                                if ( (callbacks.error !== null) && (callbacks.error !== undefined) ) {
+                                    callbacks.error(UNKNOWN_ERROR);
+                                }                                  
                             }
                          });
                     } else {
-                        errorDuringRequest = response.error;  
+                        if (endOfCommunicationWithErrorCallback !== null) {
+                            endOfCommunicationWithErrorCallback(response.error);
+                        }
+                        if ( (callbacks.error !== null) && (callbacks.error !== undefined) ) {
+                            callbacks.error(response.error);
+                        }                         
                     }
                 } else {
-                    methodResponse = dataFromServer;
                     if (endOfCommunicationWithSuccessCallback !== null) {
                         endOfCommunicationWithSuccessCallback();
-                    }                    
+                    }
+                    if ( (callbacks.success !== null) && (callbacks.success !== undefined) ) {
+                        callbacks.success(dataFromServer);
+                    }                      
                 }
             }, this),
             error: function () {
-                errorDuringRequest = "Error " + UNKNOWN_ERROR;
+                if (endOfCommunicationWithErrorCallback !== null) {
+                    endOfCommunicationWithErrorCallback(UNKNOWN_ERROR);
+                }
+                if ( (callbacks.error !== null) && (callbacks.error !== undefined) ) {
+                    callbacks.error(UNKNOWN_ERROR);
+                }                 
             }
         });
-        
-        if (errorDuringRequest != null) {
-            if (endOfCommunicationWithErrorCallback !== null) {
-                endOfCommunicationWithErrorCallback(response.error);
-            }            
-        }
-        
-        return methodResponse;
     }
     
 /***** PUBLIC METHODS *****/
     
     /**
-     *
-     * @return array
+     * @param object callbacks - it has 2 keys: 'success' and 'error'
+     *        Those 2 callbacks are passed the data coming from the server
      */
-    this.getServerTime = function() {
-        var response = sendRequest.call(this, {}, 'getServerTime');
-
-        return response.time;
+    this.getServerTime = function(callbacks) {
+        sendRequest.call(this, {}, 'getServerTime', callbacks);
     } 
     
      /**
      * @param int fromTimestamp (=null) - to return only the lists created or edited after this timestamp (GMT)
      * @param int toTimestamp (=null) - to return only the lists created or edited till this timestamp (GMT)
-     * @return object
+     * @param object callbacks - it has 2 keys: 'success' and 'error'
+     *        Those 2 callbacks are passed the data coming from the server
      */
-    this.getLists = function(fromTimestamp, toTimestamp)
+    this.getLists = function(fromTimestamp, toTimestamp, callbacks)
     {
         params = {};
 
@@ -413,17 +427,16 @@ PLANCAKE.PlancakeApiClient = function(settings) {
             params.to_ts = toTimestamp;
         }
 
-        response = sendRequest.call(this, params, 'getLists');
-
-        return response.lists;
+        sendRequest.call(this, params, 'getLists', callbacks);
     }  
     
     /**
      *
      * @param object (PlancakeTask) task
-     * @return int - the taskId
+     * @param object callbacks - it has 2 keys: 'success' and 'error'
+     *        Those 2 callbacks are passed the data coming from the server
      */
-    this.addTask = function(task)
+    this.addTask = function(task, callbacks)
     {        
         params.descr = task.description;
         params.is_header = task.isHeader ? 1 : 0;
@@ -446,9 +459,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
         if (task.tagIds !== null)
             params.tag_ids = task.tagIds;
 
-        response = sendRequest.call(this, params, 'addTask');
-
-        return response.task_id;
+        sendRequest.call(this, params, 'addTask', callbacks);
     }
     
 }
