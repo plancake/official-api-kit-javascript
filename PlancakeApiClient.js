@@ -336,7 +336,7 @@ PLANCAKE.PlancakeApiClient = function(settings) {
                     // if the error is an INVALID_TOKEN_ERROR, we try to get the token again
                     // (maybe it was just expired)
                     if (response.error == INVALID_TOKEN_ERROR) {
-                        resetToken();
+                        resetToken.call(this);                       
                         request = prepareRequest.call(this, params, methodName);
 
                         $.ajax({
