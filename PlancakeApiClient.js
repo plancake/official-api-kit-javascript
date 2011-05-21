@@ -187,7 +187,9 @@ PLANCAKE.PlancakeApiClient = function(settings) {
     var getSignatureForRequest = function(params, methodName) {
         
         var paramKeys = [];
-        var key, i, str;
+        var key; 
+        var i; 
+        var str;
             
         for (key in params) {
             if (params.hasOwnProperty(key)) {
@@ -219,7 +221,9 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      *   }
      */
     var prepareRequest = function(params, methodName) {
-        var request = {}, signature, key;
+        var key;
+        var request = {};
+        var signature;
 
         params.token = this.token;
         params.api_ver = API_VER;
@@ -243,9 +247,9 @@ PLANCAKE.PlancakeApiClient = function(settings) {
     var resetToken = function() {
         // we don't have a token yet or it has been reset as
         // it was probably expired
-        var params = {},
-            request = null,
-            response = null;
+        var params = {};
+        var request = null;
+        var response = null;
 
 
         this.token = '';
@@ -304,7 +308,8 @@ PLANCAKE.PlancakeApiClient = function(settings) {
      * @return json object
      */
     var sendRequest = function(params, methodName, callbacks, httpMethod) {
-        var request = null, response = null;          
+        var request = null;
+        var response = null;          
         
         if ( (httpMethod === undefined) || (httpMethod === null) ) {
             httpMethod = 'POST'; // if we use GET, the reply could be cached, even if we don't want

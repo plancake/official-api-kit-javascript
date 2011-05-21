@@ -79,9 +79,8 @@ $(document).ready(function() {
     });
     
     $('form#enterTask').submit(function() {
-        plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
-
         var task = new PLANCAKE.Task();
+        plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
         
         task.description = $('#enterTaskValue').val();
         task.listId = $('select#listsCombo').val();
@@ -164,10 +163,14 @@ PLANCAKE_CHROME_EXTENSION.refreshListsCombo = function() {
 
 PLANCAKE_CHROME_EXTENSION.populateListsCombo = function()
 {
+    var lists = null;
+    var plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
+    
     function buildHtml(lists)
     {
+        var listItem = null;
+        var listsOption = null;        
         var listsCombo = $('select#listsCombo');
-        var listItem = null, listsOption = null;
 
         listsCombo.find('option').remove(); // removing all the old options
 
@@ -181,9 +184,6 @@ PLANCAKE_CHROME_EXTENSION.populateListsCombo = function()
             listsCombo.append(listsOption);
         }        
     }
-    
-    var plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
-    var lists = null;
 
     if (window.localStorage)
     {
