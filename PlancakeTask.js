@@ -18,6 +18,9 @@
 *                                                                                    *
 **************************************************************************************/
 
+/*global PLANCAKE */
+/*jslint white: true, devel: true, onevar: false, browser: true, undef: true, nomen: true, regexp: true, plusplus: true, bitwise: true, newcap: true, safe: false, maxerr: 50, indent: 4 */
+
 var PLANCAKE = PLANCAKE || {};
 
 PLANCAKE.Task = function () {
@@ -32,4 +35,4 @@ PLANCAKE.Task = function () {
     this.repetitionIcalRrule = null;
     this.note = null;
     this.tagIds = null; // comma-separated
-}
+};
