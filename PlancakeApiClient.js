@@ -201,7 +201,7 @@ PLANCAKE.PlancakeApiClient = function (settings) {
         paramKeys.sort();
 
         str = methodName;
-        for (i in paramKeys) {
+        for (i=0; i < paramKeys.length; i++) {
             str +=  paramKeys[i] + params[paramKeys[i]];
         }
 

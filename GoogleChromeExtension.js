@@ -35,7 +35,7 @@ PLANCAKE_CHROME_EXTENSION.userKeyStorageName = 'userKey';
 PLANCAKE_CHROME_EXTENSION.tokenStorageName = 'token';
 PLANCAKE_CHROME_EXTENSION.listsStorageName = 'lists';
 PLANCAKE_CHROME_EXTENSION.cookieLifetimeInDays = 60;
-
+PLANCAKE_CHROME_EXTENSION.defaultUrl = 'http://www.plancake.com';
 
 $(document).ready(function () {
     var plancakeApiClient = null; 
@@ -56,6 +56,11 @@ $(document).ready(function () {
             alert(e.name + ': ' + e.message);
         }
     }
+    
+    $('a').click(function () {
+        var url = $(this).attr('href') || PLANCAKE_CHROME_EXTENSION.defaultUrl;
+        chrome.tabs.create({'url': url}, function(tab) {})
+    });
     
     $('form#enterUserKey').submit(function () {
         $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName, $('#userKeyValue').val(), {expires: PLANCAKE_CHROME_EXTENSION.cookieLifetimeInDays});
@@ -174,7 +179,7 @@ PLANCAKE_CHROME_EXTENSION.populateListsCombo = function () {
 
         listsCombo.find('option').remove(); // removing all the old options
 
-        for (i in lists) {
+        for (i=0; i < lists.length; i++) {
             listItem = lists[i];
             listsOption = $('<option></option>').val(listItem.id).html(listItem.name);
             if (listItem.is_header) {
