@@ -186,12 +186,19 @@ PLANCAKE_CHROME_EXTENSION.resetAll = function () {
 
 PLANCAKE_CHROME_EXTENSION.refreshListsCombo = function () {
     $.cookie(PLANCAKE_CHROME_EXTENSION.listsCookieName, null);
-    PLANCAKE_CHROME_EXTENSION.populateListsCombo();
+    PLANCAKE_CHROME_EXTENSION.populateListsCombo(true);
 };
 
-PLANCAKE_CHROME_EXTENSION.populateListsCombo = function () {
+/**
+ * @param boolean forceReload (=false)
+ */
+PLANCAKE_CHROME_EXTENSION.populateListsCombo = function (forceReload) {
     var lists = null;
     var plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
+    
+    if ((forceReload === null) || (forceReload === undefined)) {
+        forceReload === false;
+    }
     
     function buildHtml(lists) {
         var i;        
@@ -215,7 +222,7 @@ PLANCAKE_CHROME_EXTENSION.populateListsCombo = function () {
         lists = JSON.parse(localStorage.getItem(PLANCAKE_CHROME_EXTENSION.listsStorageName));
     }
 
-    if (!lists) {
+    if (!lists || forceReload) {
         plancakeApiClient.getLists(null, null, {
             success: function (listsFromServer) {
                 if (window.localStorage) {
