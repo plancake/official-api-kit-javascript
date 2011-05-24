@@ -38,43 +38,55 @@ PLANCAKE_CHROME_EXTENSION.cookieLifetimeInDays = 60;
 PLANCAKE_CHROME_EXTENSION.defaultUrl = 'http://www.plancake.com';
 
 $(document).ready(function () {
-    var plancakeApiClient = null; 
+    var plancakeApiClient = null;     
     
-    // $('#ajaxInProgress').css('display', 'none');    
-    
-    if (!$.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName)) {
+    var displayUserKeyScreen = function () {
         $('form#enterUserKey').show();
-        $('#userKeyValue').focus();
-    } else {
+        $('#userKeyValue').focus();    
+    }
+    
+    var hideUserKeyScreen = function () {
+        $('form#enterUserKey').hide();
+        $('form#enterTask').show();   
+    }    
+
+    var displayAddTaskScreen = function () {
         $('form#enterTask').show();
-        
+
         try {
             plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
-            
+
             PLANCAKE_CHROME_EXTENSION.populateListsCombo();            
         } catch (e) {
             alert(e.name + ': ' + e.message);
-        }
+        }    
+    }       
+    
+    if (!$.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName)) {
+        displayUserKeyScreen();
+    } else {
+        displayAddTaskScreen();
     }
     
     $('a').click(function () {
         var url = $(this).attr('href') || PLANCAKE_CHROME_EXTENSION.defaultUrl;
-        chrome.tabs.create({'url': url}, function(tab) {})
+        if (url && (url.length > 1)) // the condition on the length is to ignore '#' as url
+        {
+            chrome.tabs.create({'url': url}, function(tab) {})
+        }
     });
     
     $('form#enterUserKey').submit(function () {
-        $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName, $('#userKeyValue').val(), {expires: PLANCAKE_CHROME_EXTENSION.cookieLifetimeInDays});
-        
         try {
-            plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient();
+            plancakeApiClient = PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient($('#userKeyValue').val());
 
             plancakeApiClient.getServerTime({
                 success: function (dataFromServer) {
                     var serverTime = dataFromServer.time;
                     if (serverTime > 0) {
                         // first request to the server was successful: we are ready to go
-                        $('form#enterUserKey').hide();
-                        $('form#enterTask').show();
+                        $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName, $('#userKeyValue').val(), {expires: PLANCAKE_CHROME_EXTENSION.cookieLifetimeInDays});
+                        hideUserKeyScreen();
                         PLANCAKE_CHROME_EXTENSION.populateListsCombo();
                     } else {
                         alert("Some error occurred. Are you sure the userKey was correct?");
@@ -125,21 +137,26 @@ $(document).ready(function () {
 
 /*
  * It implements a Singleton design pattern
+ * @param string userKey (=null)
  */
-PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient = function () {
+PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient = function (userKey) {
     var token;
     
+    if ((userKey === null) || (userKey === undefined)) {
+        userKey = $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName);        
+    }
+    
     if (PLANCAKE_CHROME_EXTENSION.plancakeApiClient === null) {
-        if (!$.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName)) {
-            alert("You need to store the userKey in a cookie before getting an API client");
+        if (!userKey) {
+            alert("You need a userKey before getting an API client");
             return null;
         }
-        
+
         PLANCAKE_CHROME_EXTENSION.plancakeApiClient = new PLANCAKE.PlancakeApiClient({
             apiKey: PLANCAKE_CHROME_EXTENSION.apiKey, 
             apiSecret: PLANCAKE_CHROME_EXTENSION.apiSecret,
             apiEndpointUrl: PLANCAKE_CHROME_EXTENSION.apiEndpointUrl,
-            userKey: $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName), // check Settings page
+            userKey: userKey, // check Settings page
             startOfCommunicationCallback: PLANCAKE_CHROME_EXTENSION.startOfCommunicationCallback,
             endOfCommunicationWithSuccessCallback: PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithSuccessCallback,
             endOfCommunicationWithErrorCallback: PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithErrorCallback              
@@ -157,7 +174,12 @@ PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient = function () {
 
 PLANCAKE_CHROME_EXTENSION.resetAll = function () {
     $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName, null);
-    $.cookie(PLANCAKE_CHROME_EXTENSION.listsCookieName, null);        
+    
+    if (window.localStorage) {
+        localStorage.setItem(PLANCAKE_CHROME_EXTENSION.tokenStorageName, null);
+        localStorage.setItem(PLANCAKE_CHROME_EXTENSION.listsCookieName, null);        
+    }    
+    
     $('form#enterUserKey').show();
     $('form#enterTask').hide();        
 };
@@ -210,13 +232,29 @@ PLANCAKE_CHROME_EXTENSION.populateListsCombo = function () {
 
 PLANCAKE_CHROME_EXTENSION.startOfCommunicationCallback = function () {
     $('#ajaxInProgress').show();
+
+    $('form#enterTask').block({
+        message: '',
+        css: {border: '1px solid #ff9922', padding: '5px'},
+        applyPlatformOpacityRules: false
+    });
+  
 };
 
 PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithSuccessCallback = function () {
+    function hiding() {
+        $('#successFeedback').hide('fast');
+    }
+    
     if (window.localStorage) {
         localStorage.setItem(PLANCAKE_CHROME_EXTENSION.tokenStorageName, PLANCAKE_CHROME_EXTENSION.getPlancakeApiClient().token);
     }    
     $('#ajaxInProgress').hide();
+    
+    $('#successFeedback').text('Operation completed successfully.').show();
+    setTimeout(hiding, 4000);
+
+    $('form#enterTask').unblock();
 };
 
 PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithErrorCallback = function (errorMessage) {
@@ -227,4 +265,6 @@ PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithErrorCallback = function (errorM
     $('#ajaxInProgress').hide();
     $('#errorFeedback').text('An error occurred (error code: ' + errorMessage + ' )').show();
     setTimeout(hiding, 4000);
+    
+    $('form#enterTask').unblock();    
 };
