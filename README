@@ -10,7 +10,7 @@ In order to use this, you need to get an API key here:
 http://www.plancake.com/api-documentation
 
 
-To get started, have a look at the Example.js file and explore the public methods of the PLANCAKE.PlancakeApiClient class. 
+To get started, have a look at the Example.html file and explore the public methods of the PLANCAKE.PlancakeApiClient class. 
 
 
 Please use the API reference for more details:

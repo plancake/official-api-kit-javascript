@@ -24,10 +24,10 @@ try {
     }    
     
     PLANCAKE.ApiClient = new PLANCAKE.PlancakeApiClient({
-            apiKey: 'efe31c2f0e034b0c76c7cf6be60b0842f280ee8c', 
-            apiSecret: 'g3q82y4UxhYP69Ss',
+            apiKey: 'efe21c2f0e034b0c76c7cf6be60b0842f280ee8c', // obtain an API key from http://www.plancake.com/api-documentation 
+            apiSecret: 'g2q82y4UxhYP69Ss',  // obtain an API secret from http://www.plancake.com/api-documentation
             apiEndpointUrl: 'http://www.plancake/api_dev.php',
-            userKey: 'jXkGa0uRuOlxcDO9VzeUWwfFIekYQZZj', // check Settings page
+            userKey: 'jX8fr0uRuOlxcDO9VzeUWwfFIekYQZZj', // check your Plancake Settings page
             userEmailAddress: '', // this is usually empty
             userPassword: '', // this is usually empty
             extraInfoForGetTokenCall: 'js_api_test'                                                                  
