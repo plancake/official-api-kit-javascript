@@ -11,7 +11,8 @@ http://www.plancake.com/api-documentation
 
 
 To get started, have a look at the Example.html file and explore the public methods of the PLANCAKE.PlancakeApiClient class. 
-
+In order to make the example work, you need to request an API key and an API secret from:
+http://www.plancake.com/api-documentation
 
 Please use the API reference for more details:
 http://www.plancake.com/api-documentation
