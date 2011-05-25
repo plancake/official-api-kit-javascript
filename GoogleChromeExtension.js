@@ -42,7 +42,9 @@ $(document).ready(function () {
     
     var displayUserKeyScreen = function () {
         $('form#enterUserKey').show();
-        $('#userKeyValue').focus();    
+        $('#userKeyValue').focus();
+        $('#resetLink').hide();
+        $('#getUrlLink').hide();      
     }
     
     var hideUserKeyScreen = function () {
@@ -59,7 +61,10 @@ $(document).ready(function () {
             PLANCAKE_CHROME_EXTENSION.populateListsCombo();            
         } catch (e) {
             alert(e.name + ': ' + e.message);
-        }    
+        }
+        $('#enterTaskValue').focus();
+        $('#resetLink').show();
+        $('#getUrlLink').show();          
     }       
     
     if (!$.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName)) {
@@ -88,6 +93,7 @@ $(document).ready(function () {
                         $.cookie(PLANCAKE_CHROME_EXTENSION.userKeyStorageName, $('#userKeyValue').val(), {expires: PLANCAKE_CHROME_EXTENSION.cookieLifetimeInDays});
                         hideUserKeyScreen();
                         PLANCAKE_CHROME_EXTENSION.populateListsCombo();
+                        displayAddTaskScreen();
                     } else {
                         alert("Some error occurred. Are you sure the userKey was correct?");
                     }
@@ -259,7 +265,7 @@ PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithSuccessCallback = function () {
     $('#ajaxInProgress').hide();
     
     $('#successFeedback').text('Operation completed successfully.').show();
-    setTimeout(hiding, 4000);
+    setTimeout(hiding, 2000);
 
     $('form#enterTask').unblock();
 };
@@ -271,7 +277,7 @@ PLANCAKE_CHROME_EXTENSION.endOfCommunicationWithErrorCallback = function (errorM
     
     $('#ajaxInProgress').hide();
     $('#errorFeedback').text('An error occurred (error code: ' + errorMessage + ' )').show();
-    setTimeout(hiding, 4000);
+    setTimeout(hiding, 2000);
     
     $('form#enterTask').unblock();    
 };
